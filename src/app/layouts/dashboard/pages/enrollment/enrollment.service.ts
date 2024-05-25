@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { IStudent } from '../students/models';
 import { ICourse } from '../courses/models';
 import { StudentsService } from '../students/students.service';

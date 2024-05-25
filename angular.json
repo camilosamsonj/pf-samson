@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "primera-entrega-pf-Samson": {
+    "pf-samson": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -20,7 +20,7 @@
             "allowedCommonJsDependencies": [
               "lodash"
             ],
-            "outputPath": "dist/primera-entrega-pf-samson",
+            "outputPath": "dist/pf-samson",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -39,7 +39,6 @@
             "scripts": [
               "node_modules/sweetalert2/dist/sweetalert2.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
-              
             ]
           },
           "configurations": {
@@ -79,10 +78,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "primera-entrega-pf-Samson:build:production"
+              "browserTarget": "pf-samson:build:production"
             },
             "development": {
-              "browserTarget": "primera-entrega-pf-Samson:build:development"
+              "browserTarget": "pf-samson:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -90,7 +89,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "primera-entrega-pf-Samson:build"
+            "browserTarget": "pf-samson:build"
           }
         },
         "test": {
@@ -114,5 +113,10 @@
         }
       }
     }
+  },
+  "cli": {
+    "schematicCollections": [
+      "@ngrx/schematics"
+    ]
   }
 }

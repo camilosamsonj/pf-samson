@@ -6,6 +6,9 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { StudentsService } from './students.service';
 import swal from 'sweetalert2'
 import { CoursesService } from '../courses/courses.service';
+import { Store } from '@ngrx/store';
+import { selectStudentsList} from './store/student.selectors';
+import { StudentActions } from './store/student.actions';
 
 
 @Component({
@@ -29,7 +32,8 @@ export class StudentsComponent implements OnInit {
     private matDialog: MatDialog,
     private breakingpointObsver: BreakpointObserver,
     private studentsService: StudentsService,
-    private coursesService: CoursesService
+    private coursesService: CoursesService,
+    private store: Store
   ) {
     this.breakingpointObsver.observe([Breakpoints.Handset]).subscribe((res) => {
       if (res.matches) {
@@ -48,25 +52,48 @@ export class StudentsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loading = true;
-    this.studentsService.getStudents().subscribe({
+    this.loadStudents();
+    this.loadCourses();
+  }
+
+  loadStudents(): void {
+    // this.loading = true;
+    this.store.dispatch(StudentActions.loadStudents());
+    this.store.select(selectStudentsList).subscribe({
       next: (students) => {
         this.students = students;
-      },
-      error: (error) => {
-        console.log(error);
-      },
-      complete: () => {
-        this.loading = false;
-      },
-      
-    });
+      }
+    })
+    // this.studentsService.getStudents().subscribe({
+    //   next: (students) => {
+    //     this.students = students;
+    //   },
+    //   error: (error) => {
+    //     console.log(error);
+    //   },
+    //   complete: () => {
+    //     this.loading = false;
+    //   },
+    // });
+  }
+
+  loadCourses(): void {
+    this.loading = true;
+    this.loadStudents();
+    
     this.coursesService.getCourses().subscribe({
       next: (courses) => {
         courses;
+      },
+      error: () => {},
+
+      complete: () => {
+        this.loading = false;
       }
     })
   }
+
+
 
   openDialog(editingStudent?: IStudent): void {
 
@@ -184,3 +211,4 @@ export class StudentsComponent implements OnInit {
 
   
 }
+

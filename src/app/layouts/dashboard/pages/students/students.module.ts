@@ -5,6 +5,10 @@ import { StudentDialogComponent } from './components/student-dialog/student-dial
 import {StudentsRoutingModule} from './students-routing.module';
 import { StudentDetailComponent } from './pages/student-detail/student-detail.component';
 import { CommonModule } from '@angular/common';
+import { EffectsModule } from '@ngrx/effects';
+import { StudentEffects } from './store/student.effects';
+import { StoreModule } from '@ngrx/store';
+import {studentFeature} from './store/student.reducer'
 
 @NgModule({
   declarations: [ StudentsComponent,  StudentDetailComponent, StudentDialogComponent,
@@ -14,6 +18,8 @@ import { CommonModule } from '@angular/common';
     CommonModule,
     SharedModule,
     StudentsRoutingModule,
+    StoreModule.forFeature(studentFeature),
+    EffectsModule.forFeature([StudentEffects]),
   ],
   exports: [StudentsComponent],
 })

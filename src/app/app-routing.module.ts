@@ -8,7 +8,7 @@ const routes: Routes = [
 
   {
     path: 'dashboard',
-    canActivate: [authGuard],
+    // canActivate: [authGuard],
     component: DashboardComponent,
     loadChildren: ()=> 
       import('./layouts/dashboard/dashboard.module')
@@ -27,11 +27,7 @@ const routes: Routes = [
     path: '**',
     redirectTo: 'auth',
   }
-
-
-
 ];
-
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]

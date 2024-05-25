@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild, Inject, OnDestroy } from '@angular/core';
 import { MatDrawer } from '@angular/material/sidenav';
 import { Observable, Subscription } from 'rxjs';
 import { IUser } from './pages/users/models'
-import { AuthService } from 'src/app/core/services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
 
 

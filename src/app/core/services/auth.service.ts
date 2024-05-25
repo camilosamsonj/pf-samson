@@ -65,6 +65,8 @@ export class AuthService {
 
 
   logout(): void {
+    
+
     this._authUser$.next(null); 
     sessionStorage.removeItem('accessToken');
     const Toast = swal.mixin({

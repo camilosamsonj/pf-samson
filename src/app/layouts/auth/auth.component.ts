@@ -5,6 +5,9 @@ import { Subscription } from 'rxjs';
 import { AuthService  } from './../../core/services/auth.service';
 import swal from 'sweetalert2'
 import { ILoginData } from './models';
+import { Store } from '@ngrx/store';
+import { authActions } from '../../store/auth/auth.actions';
+import { authUser } from '../../store/auth/auth.selectors';
 
 @Component({
   selector: 'app-auth',
@@ -24,7 +27,8 @@ export class AuthComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private store: Store
   ) {
     this.authUserForm = this.fb.group({
       email: [
@@ -42,7 +46,11 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscribeToAuthUserChange();
+    this.store.select(authUser).subscribe({
+      next: (user) => {
+        if(user)  this.router.navigate(['dashboard', 'home']);
+      }
+    })
   }
   ngOnDestroy(): void {
     this.authUserChangeSubscription?.unsubscribe();
@@ -53,39 +61,59 @@ export class AuthComponent implements OnInit, OnDestroy {
   get passwordControl() {
     return this.authUserForm.get('password');
   }
-
-  subscribeToAuthUserChange(): void {
-    this.authUserChangeSubscription = this.authService.authUser$.subscribe({
-      next: (authUser) => {
-        if (authUser != null) {
-          this.router.navigate(['auth']);
-        }
-      },
-    });
-  }
+  
 
   login(): void {
-  this.authService.login(this.authUserForm.value, this.authUserForm).subscribe((loggedIn: boolean)=> {
-        if(loggedIn) {
-          const Toast = swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.onmouseenter = swal.stopTimer;
-              toast.onmouseleave = swal.resumeTimer;
-            }
-          });
-          Toast.fire({
-            icon: 'success',
-            title: 'Inicio de sesión exitoso'
-          });
+    if(this.authUserForm.invalid){
+      swal.fire({
+        title: 'Formulario Invalido',
+        icon: 'warning',
+        text: 'Por favor complete los campos requeridos'
+      });
+    } else {
+      this.store.dispatch(authActions.login({payload: this.authUserForm.getRawValue()}));
+      const Toast = swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = swal.stopTimer;
+          toast.onmouseleave = swal.resumeTimer;
         }
-      })
-    } 
+      });
+      Toast.fire({
+        icon: 'success',
+        title: 'Inicio de sesión exitoso'
+      });
+    }
+  } 
 
+
+
+  logout(): void {
+    this.store.dispatch(authActions.logout());
+    const Toast = swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+      didOpen: (toast: any) => {
+        toast.onmouseenter = swal.stopTimer;
+        toast.onmouseleave = swal.resumeTimer;
+      }
+    });
+    Toast.fire({
+      icon: 'info',
+      title: '¡Hasta pronto!'
+    });
+    this.router.navigate(['auth']);
+    
+  }
+
+  
     onKeyDown(event: KeyboardEvent){
       if (event.key === 'Enter') {
         this.login();
