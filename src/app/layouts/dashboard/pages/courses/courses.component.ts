@@ -7,6 +7,11 @@ import swal from 'sweetalert2';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { EnrollmentService } from '../enrollment/enrollment.service';
 import { StudentsService } from '../students/students.service';
+import { Store } from '@ngrx/store';
+import { selectCoursesError, selectCoursesList, selectLoadingCourses } from './store/courses.selectors';
+import { Observable, map } from 'rxjs';
+import { CoursesActions } from './store/courses.actions';
+import { SweetAlertService } from '../../../../core/services/sweet-alert.service';
 
 
 @Component({
@@ -23,17 +28,19 @@ export class CoursesComponent {
     'actions',
   ];
 
-  loading = false;
-  courses: ICourse[] = [];
+  loadingCourses$: Observable<boolean>;
+
   studentId: string = '';
   courseId: string = '';
+  error$: Observable<unknown>;
+  courses$: Observable<ICourse[]>;
 
   constructor(
     private coursesService: CoursesService,
     private matDialog: MatDialog,
     private breakinpointObserver: BreakpointObserver,
-    private enrollmentService: EnrollmentService,
-    private studentsService: StudentsService
+    private store: Store,
+    private sweetAlertService: SweetAlertService,
   ) {
     this.breakinpointObserver.observe([Breakpoints.Handset]).subscribe((r) => {
       if (r.matches) {
@@ -49,23 +56,20 @@ export class CoursesComponent {
         ];
       }
     });
-    // this.courses$ = this.coursesService.getCourses();
+    this.error$ = this.store.select(selectCoursesError);
+    this.courses$ = this.store.select(selectCoursesList);
+    this.loadingCourses$ = this.store.select(selectLoadingCourses);
+    
   }
 
   ngOnInit(): void {
-    this.loading = true;
-    this.coursesService.getCourses().subscribe({
-      next: (courses) => {
-        this.courses = courses;
-      },
-      error: (error) => {
-        console.log(error);
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
+  this.loadCourses();
   }
+
+  loadCourses(): void {
+    this.store.dispatch(CoursesActions.loadCourses());
+  }
+
 
   openDialog(editingCourse?: ICourse): void {
     this.matDialog
@@ -79,38 +83,19 @@ export class CoursesComponent {
                 result };
               this.coursesService.updateCourse(updatedCourse).subscribe({
                 next: () => {
-                  this.courses = this.courses.map((c) =>
-                    c.id === editingCourse.id ? { ...c, ...result } : 
-                  c);
+                  this.courses$ = this.courses$.pipe(map(courses => courses.map((c) => c.id === editingCourse.id ? {...c, ...result}: c)));
                 },
                 error: (error) => {
-                  
-                  swal.fire({
-                    title: 'Error',
-                    text: `Ocurrió un error al intentar editar el curso: ${error}`,
-                    icon: 'success',
-                    timer: 1000,
-                    timerProgressBar: true,
-                    showConfirmButton: false,
-                  });
-                  console.log('Error al editar el curso: ', error);
+                  this.sweetAlertService.showCustomAlert('Error', `Ocurrió un error al intentar editar el curso ${error}`, 'error');
                 },
                 complete: () => {
-                  swal.fire({
-                    title: '¡Cambios Aplicados!',
-                    text: '¡El curso se ha editado correctamente!',
-                    icon: 'success',
-                    timer: 1000,
-                    timerProgressBar: true,
-                    showConfirmButton: false,
-                  });
+                  this.sweetAlertService.showCustomAlert('¡Cambios aplicados!', 'El curso se ha editado correctamente', 'success');
                 },
               });
             } else {
               this.coursesService.createCourse(result).subscribe({
                 next: (createdCourse) => {
-                  this.courses = [...this.courses, createdCourse];
-                  console.log(result);
+                  this.courses$ = this.courses$.pipe(map((courses: ICourse[]) => ([...courses, createdCourse])));
                 },
                 error: (error) => {
                   
@@ -155,7 +140,7 @@ export class CoursesComponent {
             this.coursesService.deleteCourse(id).subscribe({
               next: () => {
 
-                this.courses = this.courses.filter((course) => course.id !== id);
+                this.courses$ = this.courses$.pipe(map(courses => courses.filter(course => course.id !== id)));
               },
               error: (error) => {
                 swal.fire({

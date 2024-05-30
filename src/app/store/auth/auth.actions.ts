@@ -6,5 +6,6 @@ export const authActions = createActionGroup({
     events: {
         login: props<{payload: ILoginData}>(),
         logout: emptyProps(),
-    }
+    },
 })
+

@@ -10,26 +10,10 @@ import {
   of,
   throwError,
 } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
 
 
-let USERS_DB: IUser[] = [ {
-
-    id: 101,
-    firstName: 'Camilo',
-    lastName: 'Samson',
-    email: 'camilosamson@outlook.com',
-    role: 'ADMIN',
-    createdAt: new Date(2024, 2, 15),
-    },
-    {
-    id: 102,
-    firstName: 'Andres',
-    lastName: 'Smith',
-    email: 'andressmith@gmail.com',
-    role: 'USER',
-    createdAt: new Date(2024, 3, 12),
-    }
-]
 
 @Injectable({
   providedIn: 'root',
@@ -37,15 +21,27 @@ let USERS_DB: IUser[] = [ {
 
 export class UsersService {
 
-  constructor() {}
+  constructor(private httpClient: HttpClient ) {}
 
   getUsers(): Observable<IUser[]> {
-    return of(USERS_DB);
-     }
+    return this.httpClient.get<IUser[]>(environment.baseAPIURL + '/users');
+  }
+
+  getUserById(id: string): Observable<IUser>{
+    return this.httpClient.get<IUser>(`${environment.baseAPIURL}/users/${id}`);
+  }
 
 
-  getUserById(id: number): Observable<IUser | undefined> {
-    return of(USERS_DB.find((user) => user.id === id ));
-  } 
+  createUser(payload: CreateUserPayload): Observable<IUser> {
+    return this.httpClient.post<IUser>(`${environment.baseAPIURL}/users`, payload)
+  }
+
+  deleteUser(id: number): Observable<IUser> {
+    return this.httpClient.delete<IUser>(`${environment.baseAPIURL}/users/${id}`);
+  }
+
+  updateUser(user: IUser): Observable<IUser> {
+    return this.httpClient.put<IUser>(`${environment.baseAPIURL}/users/${user.id}`, user);
+  }
 
 }

@@ -5,6 +5,10 @@ import { CoursesRoutingModule } from './courses-routing.module';
 import { CoursesDialogComponent } from './components/courses-dialog/courses-dialog.component';
 import { CoursesDetailComponent } from './pages/courses-detail/courses-detail.component';
 import { CommonModule } from '@angular/common';
+import { EffectsModule } from '@ngrx/effects';
+import { CoursesEffects } from './store/courses.effects';
+import { StoreModule } from '@ngrx/store';
+import { coursesFeature } from './store/courses.reducer';
 
 
 @NgModule({
@@ -14,6 +18,10 @@ import { CommonModule } from '@angular/common';
     CommonModule,
     SharedModule,
     CoursesRoutingModule,
+    StoreModule.forFeature(coursesFeature),
+    EffectsModule.forFeature([CoursesEffects]),
+
+
 
   ],
   exports: [

@@ -1,22 +1,33 @@
 <div
-  *ngIf="loading"
+  *ngIf="loadingUsers$ | async; else elseBlock"
   class="d-flex justify-content-center align-items-center"
   style="height: 300px"
 >
   <mat-spinner color="warn"></mat-spinner>
 </div>
 
-<ng-container *ngIf="!loading">
+<ng-template #elseBlock>
+  <ng-template *ngIf="error$ | async; else nonErrorBlock">
+    <p>Error: {{error$ | async | json}}</p>
+</ng-template>
+</ng-template>
+
+
+<ng-template #nonErrorBlock>
+  <div>
+    
+  </div>
+
   <div class="d-flex justify-content-end mb-3">
     <button (click)="openDialog()" mat-raised-button color="basic">
       Crear Usuario
       <mat-icon> person_add</mat-icon>
     </button>
   </div>
-
-  <table
-    *ngIf="users$ | async as users"
-    [dataSource]="users"
+ 
+  <div>
+    <table
+    [dataSource]="users$"
     id="custom-table"
     class="d-flex mat-elevation-z8 table-hover"
     mat-table
@@ -102,4 +113,6 @@
       class="table-row-hover"
     ></tr>
   </table>
-</ng-container>
+  </div>
+
+</ng-template>

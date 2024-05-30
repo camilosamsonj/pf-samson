@@ -14,5 +14,5 @@ export interface CreateUserPayload {
   lastName: string | null;
   email: string | null;
   role: UserRole | null;
-  createdAt: Date | null;
+  createdAt: Date;
 }

@@ -1,70 +1,86 @@
-<div *ngIf="loading" class="d-flex justify-content-center align-items-center" style="height: 300px;">
+<div *ngIf="loadingCourses$ | async; else elseBlock"
+ class="d-flex justify-content-center align-items-center" 
+ style="height: 300px;"
+ >
   <mat-spinner color="warn"></mat-spinner>
 </div>
 
-<ng-container *ngIf="!loading">
-  <div class="d-flex justify-content-end mb-3">
-    <button (click)="openDialog()" mat-raised-button color="basic">
-      Añadir Curso
-      <mat-icon> note_add </mat-icon>
-    </button>
-  </div>
-  <!-- SE UTILIZA EL PIPE ASYNC PARA MOSTRAR LOS DATOS DEL OBSERVABLE -->
-  <table  
-  [dataSource]="courses"
-  id="custom-table"
-  class="d-flex mat-elevation-z8 table-hover"
-  mat-table
-  class="mat-elevation-z8">
-    <!-- ID CURSO -->
-    <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef> Código </th>
-      <td mat-cell *matCellDef="let course"> # {{ course.id }} </td>
-    </ng-container>
-    <!-- NOMBRE CURSO -->
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef> Nombre </th>
-      <td mat-cell *matCellDef="let course"> {{ course.name }} </td>
-    </ng-container>
-    <!-- FECHA INICIO CURSO -->
-    <ng-container matColumnDef="startDate">
-      <th mat-header-cell *matHeaderCellDef> Fecha Inicio </th>
-      <td mat-cell *matCellDef="let course">
-        {{ course.startDate | date : "dd/MM/yyyy" }}
-      </td>
-    </ng-container>
-    <!-- DURACIÓN CURSO -->
-    <ng-container matColumnDef="durationMonths">
-      <th mat-header-cell *matHeaderCellDef> Duración </th>
-      <td mat-cell *matCellDef="let course"> {{ course.durationMonths }} meses </td>
-    </ng-container>
-    <!-- INSTRUCTOR CURSO -->
-    <ng-container matColumnDef="instructor">
-      <th mat-header-cell *matHeaderCellDef> Instructor </th>
-      <td mat-cell *matCellDef="let course"> {{ course.instructor }} </td>
-    </ng-container>
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef> Acciones </th>
-      <td mat-cell *matCellDef="let course">
-        <button mat-raised-button color="primary" [routerLink]="['/dashboard/courses/', course.id]">
-          <mat-icon> visibility </mat-icon>
-        </button>
-        <button mat-raised-button 
-        color="basic" 
-        (click)="openDialog(course)">
-          <mat-icon> edit </mat-icon>
-        </button>
-        <button mat-raised-button 
-        color="warn"
-        (click)="onDeleteCourse(course.id)">
-          <mat-icon> delete </mat-icon>
-        </button>
-      </td>
-    </ng-container>
+<ng-template #elseBlock>
+  <ng-container *ngIf="error$ | async; else nonErrorBlock">
+    <p>Error: {{error$ | async | json}}</p>
+  </ng-container>
+</ng-template>
+
+<ng-template #nonErrorBlock>
+
   
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"
-    class="table-row-hover"></tr>
-  </table>
-  
-</ng-container>
+    <div class="d-flex justify-content-end mb-3">
+      <button (click)="openDialog()" mat-raised-button color="basic">
+        Añadir Curso
+        <mat-icon> note_add </mat-icon>
+      </button>
+    </div>
+    <!-- SE UTILIZA EL PIPE ASYNC PARA MOSTRAR LOS DATOS DEL OBSERVABLE -->
+    <table  
+    [dataSource]="courses$"
+    id="custom-table"
+    class="d-flex mat-elevation-z8 table-hover"
+    mat-table
+    class="mat-elevation-z8">
+      <!-- ID CURSO -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> Código </th>
+        <td mat-cell *matCellDef="let course"> # {{ course.id }} </td>
+      </ng-container>
+      <!-- NOMBRE CURSO -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Nombre </th>
+        <td mat-cell *matCellDef="let course"> {{ course.name }} </td>
+      </ng-container>
+      <!-- FECHA INICIO CURSO -->
+      <ng-container matColumnDef="startDate">
+        <th mat-header-cell *matHeaderCellDef> Fecha Inicio </th>
+        <td mat-cell *matCellDef="let course">
+          {{ course.startDate | date : "dd/MM/yyyy" }}
+        </td>
+      </ng-container>
+      <!-- DURACIÓN CURSO -->
+      <ng-container matColumnDef="durationMonths">
+        <th mat-header-cell *matHeaderCellDef> Duración </th>
+        <td mat-cell *matCellDef="let course"> {{ course.durationMonths }} meses </td>
+      </ng-container>
+      <!-- INSTRUCTOR CURSO -->
+      <ng-container matColumnDef="instructor">
+        <th mat-header-cell *matHeaderCellDef> Instructor </th>
+        <td mat-cell *matCellDef="let course"> {{ course.instructor }} </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+        <td mat-cell *matCellDef="let course">
+          <button mat-raised-button color="primary" [routerLink]="['/dashboard/courses/', course.id]">
+            <mat-icon> visibility </mat-icon>
+          </button>
+          <button mat-raised-button 
+          color="basic" 
+          (click)="openDialog(course)">
+            <mat-icon> edit </mat-icon>
+          </button>
+          <button mat-raised-button 
+          color="warn"
+          (click)="onDeleteCourse(course.id)">
+            <mat-icon> delete </mat-icon>
+          </button>
+        </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"
+      class="table-row-hover"></tr>
+    </table>
+    
+
+
+
+
+</ng-template>
+

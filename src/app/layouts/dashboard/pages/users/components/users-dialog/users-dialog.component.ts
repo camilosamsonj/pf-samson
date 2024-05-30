@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import swal from 'sweetalert2';
 import { IUser } from '../../models';
-import { Observable, forkJoin, of } from 'rxjs';
 
 
 @Component({
@@ -76,11 +75,6 @@ export class UsersDialogComponent {
   }
   get roleControl(){
     return this.userForm.get('role');
-  }
-
-
-  ngOnInit(): void {
-
   }
 
   onSave(): void {

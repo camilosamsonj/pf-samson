@@ -1,22 +1,39 @@
 {
-  "users": [],
-  "students": [
+  "users": [
     {
-      "id": "1d4c",
-      "firstName": "Camiloas",
+      "id": "37dd",
+      "firstName": "Camilo",
       "lastName": "Samson",
       "email": "camilosamson@outlook.com",
-      "anoIngreso": 2024,
-      "courses": []
+      "role": "USER",
+      "createdAt": "2024-05-30T01:42:21.249Z"
+    }
+  ],
+  "students": [
+    {
+      "id": "e4ad",
+      "firstName": "Camilo",
+      "lastName": "Samson",
+      "email": "camilosamson@outlook.com",
+      "anoIngreso": 2012,
+      "courses": [
+        {
+          "id": "7356",
+          "name": "Angular",
+          "durationMonths": 6,
+          "instructor": "Josue Baez",
+          "startDate": "2024-05-22T04:00:00.000Z"
+        }
+      ]
     }
   ],
   "courses": [
     {
-      "id": "a9a7",
-      "name": "Angular",
-      "durationMonths": 6,
-      "instructor": "Josue Baez",
-      "startDate": "2024-05-22T04:00:00.000Z",
+      "id": "d2e3",
+      "name": "fgasd",
+      "durationMonths": 5,
+      "instructor": "dfasd",
+      "startDate": "2024-05-29T04:00:00.000Z",
       "students": []
     }
   ]

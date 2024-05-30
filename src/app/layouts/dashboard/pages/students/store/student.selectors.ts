@@ -7,3 +7,7 @@ export const selectStudentState = createFeatureSelector<fromStudent.State>(
 
 
 export const selectStudentsList = createSelector(selectStudentState, (s) => s.students );
+
+export const selectLoadingStudents = createSelector(selectStudentState,  (s) => s.loadingStudents);
+
+export const selectErrorStudents = createSelector(selectStudentState,  (s) => s.error);

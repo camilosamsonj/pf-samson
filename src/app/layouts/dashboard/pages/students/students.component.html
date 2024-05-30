@@ -1,96 +1,110 @@
 <div
-  *ngIf="loading"
+  *ngIf="loadingStudents$ | async; else elseBlock"
   class="d-flex justify-content-center align-items-center"
   style="height: 300px"
 >
   <mat-spinner color="warn"></mat-spinner>
 </div>
 
-<ng-container *ngIf="!loading">
-  <div class="d-flex justify-content-end mb-3">
-    <button (click)="openDialog()" mat-raised-button color="basic">
-      Crear Alumno
-      <mat-icon> person_add</mat-icon>
-    </button>
+<ng-template #elseBlock>
+  <ng-container *ngIf="error$ | async; else nonErrorBlock">
+<p>Error: {{error$ | async | json}}
+  </ng-container>
+</ng-template>
+
+
+<ng-template #nonErrorBlock>
+
+  <div>
+    <div class="d-flex justify-content-end mb-3">
+      <button (click)="openDialog()" mat-raised-button color="basic">
+        Crear Alumno
+        <mat-icon> person_add</mat-icon>
+      </button>
+    </div>
+  
+    <table
+      [dataSource]="students$"
+      id="custom-table"
+      class="d-flex mat-elevation-z8 table-hover"
+      mat-table
+      class="mat-elevation-z8"
+    >
+      <!-- ID COLUMN -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let student">#{{ student.id }}</td>
+      </ng-container>
+  
+      <!-- FIRST NAME COLUMN  -->
+  
+      <ng-container matColumnDef="firstName">
+        <th mat-header-cell *matHeaderCellDef>Nombre</th>
+        <td mat-cell *matCellDef="let student">
+          {{ student.firstName }}
+        </td>
+      </ng-container>
+  
+      <!-- LAST NAME COLUMN  -->
+  
+      <ng-container matColumnDef="lastName">
+        <th mat-header-cell *matHeaderCellDef>Apellido</th>
+        <td mat-cell *matCellDef="let student">
+          {{ student.lastName }}
+        </td>
+      </ng-container>
+  
+      <!-- EMAIL COLUMN  -->
+  
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let student">
+          {{ student.email }}
+        </td>
+      </ng-container>
+  
+      <!-- AÑO DE INGRESO COLUMN  -->
+  
+      <ng-container matColumnDef="anoIngreso">
+        <th mat-header-cell *matHeaderCellDef>Año de Ingreso</th>
+        <td mat-cell *matCellDef="let student">
+          {{ student.anoIngreso }}
+        </td>
+      </ng-container>
+  
+      <!-- ACTIONS COLUMN  -->
+  
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let student">
+          <!--Botón detalles -->
+          <button mat-raised-button color="primary" [routerLink]="['/dashboard/students/', student.id]">
+            <mat-icon> visibility </mat-icon>
+          </button>
+          <!--Botón editar -->
+          <button mat-raised-button color="basic" (click)="openDialog(student)">
+            <mat-icon> edit </mat-icon>
+          </button>
+          <!--Botón eliminar -->
+          <button
+            mat-raised-button
+            color="warn"
+            (click)="onDeleteStudent(student.id)">
+            <mat-icon> delete </mat-icon>
+          </button>
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        class="table-row-hover"
+      ></tr>
+    </table>
   </div>
+  
 
-  <table
-    [dataSource]="students"
-    id="custom-table"
-    class="d-flex mat-elevation-z8 table-hover"
-    mat-table
-    class="mat-elevation-z8"
-  >
-    <!-- ID COLUMN -->
-    <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef>ID</th>
-      <td mat-cell *matCellDef="let student">#{{ student.id }}</td>
-    </ng-container>
+</ng-template>
 
-    <!-- FIRST NAME COLUMN  -->
 
-    <ng-container matColumnDef="firstName">
-      <th mat-header-cell *matHeaderCellDef>Nombre</th>
-      <td mat-cell *matCellDef="let student">
-        {{ student.firstName }}
-      </td>
-    </ng-container>
-
-    <!-- LAST NAME COLUMN  -->
-
-    <ng-container matColumnDef="lastName">
-      <th mat-header-cell *matHeaderCellDef>Apellido</th>
-      <td mat-cell *matCellDef="let student">
-        {{ student.lastName }}
-      </td>
-    </ng-container>
-
-    <!-- EMAIL COLUMN  -->
-
-    <ng-container matColumnDef="email">
-      <th mat-header-cell *matHeaderCellDef>Email</th>
-      <td mat-cell *matCellDef="let student">
-        {{ student.email }}
-      </td>
-    </ng-container>
-
-    <!-- AÑO DE INGRESO COLUMN  -->
-
-    <ng-container matColumnDef="anoIngreso">
-      <th mat-header-cell *matHeaderCellDef>Año de Ingreso</th>
-      <td mat-cell *matCellDef="let student">
-        {{ student.anoIngreso }}
-      </td>
-    </ng-container>
-
-    <!-- ACTIONS COLUMN  -->
-
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>Acciones</th>
-      <td mat-cell *matCellDef="let student">
-        <!--Botón detalles -->
-        <button mat-raised-button color="primary" [routerLink]="['/dashboard/students/', student.id]">
-          <mat-icon> visibility </mat-icon>
-        </button>
-        <!--Botón editar -->
-        <button mat-raised-button color="basic" (click)="openDialog(student)">
-          <mat-icon> edit </mat-icon>
-        </button>
-        <!--Botón eliminar -->
-        <button
-          mat-raised-button
-          color="warn"
-          (click)="onDeleteStudent(student.id)">
-          <mat-icon> delete </mat-icon>
-        </button>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr
-      mat-row
-      *matRowDef="let row; columns: displayedColumns"
-      class="table-row-hover"
-    ></tr>
-  </table>
-</ng-container>

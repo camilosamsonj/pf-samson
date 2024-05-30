@@ -1,17 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { IUser } from './models';
-import { Observable, of, map, take } from 'rxjs';
+import { Observable, map, take, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { UsersService } from './users.service';
 import { UsersDialogComponent } from './components/users-dialog/users-dialog.component';
-import swal from 'sweetalert2'
+import swal from 'sweetalert2';
+import { Store } from '@ngrx/store';
+import {
+  selectLoadingUsers,
+  selectUsersError,
+  selectUsersList,
+} from './store/users.selectors';
+import { UsersActions } from './store/users.actions';
+import { SweetAlertService } from '../../../../core/services/sweet-alert.service';
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
 })
 export class UsersComponent implements OnInit {
-
   displayedColumns: string[] = [
     'id',
     'firstName',
@@ -20,110 +27,134 @@ export class UsersComponent implements OnInit {
     'role',
     'createdAt',
     'actions',
-  ]
+  ];
 
-  loading = false;
+  loadingUsers$: Observable<boolean>;
+  users$: Observable<IUser[]>;
+  error$: Observable<unknown>;
 
-  users$: Observable<IUser[]> = of([]);
-
-  
   constructor(
     private matDialog: MatDialog,
+    private store: Store,
+    private sweetAlertService: SweetAlertService,
     private usersService: UsersService
-  ) {}
-
-  ngOnInit(): void {
-    this.loading = true;
-    this.usersService.getUsers().subscribe({
-      next: (users$: IUser[]) => {
-        this.users$ = of(users$)
-      },
-      complete: () => {
-        this.loading = false;
-      }
-    })
+  ) {
+    this.error$ = this.store.select(selectUsersError);
+    this.users$ = this.store.select(selectUsersList);
+    this.loadingUsers$ = this.store.select(selectLoadingUsers);
   }
 
+  ngOnInit(): void {
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.store.dispatch(UsersActions.loadUsers());
+  }
 
   openDialog(editingUser?: IUser): void {
-    const dialogRef = this.matDialog.open(UsersDialogComponent, {
-      data: editingUser,
-    });
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result && this.users$) {
-        if (editingUser) {
-          this.users$ = this.users$.pipe(
-            map((users$) => {
-              return users$.map((user) => {
-                return user.id === editingUser.id
-                  ? { ...user, ...result }
-                  : user});
-            })
-          );
-          swal.fire({
-            title: '¡Cambios Aplicados!',
-            text: '¡El usuario se ha editado correctamente!',
-            icon: 'success',
-            timer: 1000,
-            timerProgressBar: true,
-            showConfirmButton: false  
-          });
-        } else {
-            this.users$ = this.users$.pipe(
-              map((users$) => {
-              let maxId = users$.reduce((max, user) => (user.id > max ? user.id : max), 0);
-                return [...users$, { ...result, id: maxId + 1 }];
-              })
-            );
-            swal.fire({
-              title: '¡Usuario Guardado!',
-              text: '¡El usuario se ha agregado correctamente!',
-              icon: 'success',
-              timer: 1000,
-              timerProgressBar: true, 
-              showConfirmButton: false 
+    this.matDialog
+      .open(UsersDialogComponent, { data: editingUser })
+      .afterClosed()
+      .subscribe({
+        next: (result) => {
+          if (result) {
+            if (editingUser) {
+              const updatedUser: IUser = { ...editingUser, ...result };
+              this.usersService
+                .updateUser(updatedUser)
+                .pipe(
+                  tap(
+                    () =>
+                      (this.users$ = this.users$.pipe(
+                        map((users) =>
+                          users.map((u) =>
+                            u.id === editingUser.id ? { ...u, ...result } : u
+                          )
+                        )
+                      ))
+                  )
+                )
+                .subscribe({
+                  next: () => {
+                    this.sweetAlertService.showCustomAlert(
+                      '¡Cambios aplicados!',
+                      'El usuario se ha editado correctamente',
+                      'success'
+                    );
+                  },
+                  error: () => {
+                    this.sweetAlertService.showCustomAlert(
+                      'Error',
+                      'Error al actualizar el usuario',
+                      'error'
+                    );
+                  },
+                });
+            } else {
+              const currentDate = new Date();
+              const userToCreate: IUser = {
+                ...result,
+                createdAt: currentDate,
+              };
+              this.usersService.createUser(userToCreate).subscribe({
+                next: (createdUser: IUser) => {
+                  this.users$ = this.users$.pipe(
+                    map((users: IUser[]) => [...users, createdUser])
+                  );
+                },
+                error: (error) => {
+                  this.sweetAlertService.showCustomAlert(
+                    'Error',
+                    `Error: ${error} al crear el usuario `,
+                    'error'
+                  );
+                },
+                complete: () => {
+                  this.sweetAlertService.showCustomAlert(
+                    'Usuario creado',
+                    'El usuario se ha creado correctamente',
+                    'success'
+                  );
+                },
+              });
+            }
+          }
+        },
+      });
+  }
+
+  onDeleteUser(id: number): void {
+    this.sweetAlertService
+      .showConfirmation('¿Estás seguro?', '¡No podrás revertir esto!')
+      .then((result) => {
+        if (result) {
+          if (this.users$) {
+            this.usersService.deleteUser(id).subscribe({
+              next: () => {
+                this.users$ = this.users$.pipe(
+                  map((users) => users.filter((user) => user.id !== id))
+                );
+              },
+              error: () => {
+                console.error('error');
+              },
+              complete: () => {
+                this.sweetAlertService.showCustomAlert(
+                  '¡Eliminado!',
+                  'El usuario ha sido eliminado correctamente',
+                  'success'
+                );
+              },
             });
           }
+        } else {
+          this.sweetAlertService.showCustomAlert(
+            'Cancelado',
+            'Ningún usuario fue elminado',
+            'info'
+          );
         }
       });
-    }
-
-    onDeleteUser(id: number): void {
-      swal.fire({
-        title: '¿Estás seguro?',
-        text: '¡No podrás revertir esto!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, eliminarlo',
-        cancelButtonText: 'No, cancelar',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          if (this.users$) {
-            this.users$ = this.users$.pipe(
-              take(1),
-              map((users) => users.filter((user) => user.id !== id))
-            );
-          }
-          swal.fire({
-            title: '¡Eliminado!', 
-            text:   'El usuario ha sido eliminado.',
-            icon:   'success',
-            timer:  1000,
-            timerProgressBar: true,
-            showConfirmButton: false
-          });
-        } else if (result.dismiss) {
-          swal.fire({
-            title: 'Cancelado',
-            text: 'Ningún usuario fue eliminado',
-            icon: 'info',
-            timer: 1000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-          });
-        }
-      });
-    }
-
-
+  }
 }
