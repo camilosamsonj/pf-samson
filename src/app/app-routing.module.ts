@@ -8,7 +8,7 @@ const routes: Routes = [
 
   {
     path: 'dashboard',
-    // canActivate: [authGuard],
+    canActivate: [authGuard],
     component: DashboardComponent,
     loadChildren: ()=> 
       import('./layouts/dashboard/dashboard.module')
@@ -17,6 +17,7 @@ const routes: Routes = [
   {
     path: 'auth',
     component: AuthComponent,
+    loadChildren: () => import('./layouts/auth/auth.module').then((m) => m.AuthModule),
   },
   {
     path: '',

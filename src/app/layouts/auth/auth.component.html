@@ -55,10 +55,15 @@
         </form>
       </div>
     </mat-card-content>
-    <mat-card-actions>
-      <button type="submit" class="w-100" mat-raised-button color="primary" (click)="login()">
+    <mat-card-actions class="row">
+      <button type="submit"  class="w-100 col-12" mat-raised-button color="primary" (click)="login()">
         Iniciar Sesion
+      </button>
+      <mat-divider></mat-divider>
+      <button (click)="openDialog()" class="w-100 col-12" mat-raised-button color="warn">
+        Registrarse
       </button>
     </mat-card-actions>
   </mat-card>
 </div>
+

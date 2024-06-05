@@ -12,6 +12,7 @@ import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { rootReducer } from './store/auth';
 import { EffectsModule } from '@ngrx/effects';
+import { AuthEffects } from './store/auth/auth.effects';
 
 
 @NgModule({
@@ -24,12 +25,12 @@ import { EffectsModule } from '@ngrx/effects';
     BrowserAnimationsModule,
     SharedModule,
     AppRoutingModule,
-    DashboardModule,
     AuthModule,
+    DashboardModule,
     HttpClientModule,
     StoreModule.forRoot(rootReducer, {}),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
-    EffectsModule.forRoot([]),
+    EffectsModule.forRoot([AuthEffects]),
    
   ],
   providers: [],

@@ -7,6 +7,7 @@ export interface IUser {
   email: string;
   role: UserRole;
   createdAt: Date;
+  password?: string;
 }
 
 export interface CreateUserPayload {

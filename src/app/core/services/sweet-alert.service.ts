@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import Swal from 'sweetalert2';
+import swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +9,7 @@ export class SweetAlertService {
   constructor() { }
 
   showAlert(title: string, text: string, icon: 'success' | 'error' | 'warning' | 'info' = 'success'): void {
-    Swal.fire({
+    swal.fire({
       title,
       text,
       icon,
@@ -20,7 +20,7 @@ export class SweetAlertService {
   }
 
   showConfirmation(title: string, text: string): Promise<boolean> {
-    return Swal.fire({
+    return swal.fire({
       title,
       text,
       icon: 'warning',
@@ -34,7 +34,7 @@ export class SweetAlertService {
 
   // Método para mostrar una alerta personalizada con variables locales
   showCustomAlert(title: string, text: string, icon: 'success' | 'error' | 'warning' | 'info' = 'success'): void {
-    Swal.fire({
+    swal.fire({
       title,
       text,
       icon,
@@ -43,4 +43,35 @@ export class SweetAlertService {
       showConfirmButton: false
     });
   }
+
+
+  showCustomToast(title: string, icon: 'info' | 'success'): void {
+    const Toast = swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+      didOpen: (toast: any) => {
+        toast.onmouseenter = swal.stopTimer;
+        toast.onmouseleave = swal.resumeTimer;
+      },
+    });
+    Toast.fire({
+      icon,
+      title,
+    })
+  }
+
+
+
+
+
+
+
+
+
+
+
+
 }

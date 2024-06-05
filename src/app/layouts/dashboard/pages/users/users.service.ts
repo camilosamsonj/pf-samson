@@ -1,17 +1,15 @@
 import { Injectable } from '@angular/core';
 import { CreateUserPayload, IUser } from './models';
 import {
-  catchError,
-  concatMap,
-  delay,
-  first,
-  forkJoin,
+
+  map,
   Observable,
   of,
-  throwError,
+
 } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
+import { Router } from '@angular/router';
 
 
 
@@ -21,7 +19,9 @@ import { environment } from '../../../../../environments/environment';
 
 export class UsersService {
 
-  constructor(private httpClient: HttpClient ) {}
+  constructor(private httpClient: HttpClient,
+    private router: Router
+   ) {}
 
   getUsers(): Observable<IUser[]> {
     return this.httpClient.get<IUser[]>(environment.baseAPIURL + '/users');
@@ -31,6 +31,14 @@ export class UsersService {
     return this.httpClient.get<IUser>(`${environment.baseAPIURL}/users/${id}`);
   }
 
+  getUserByEmail(email: string | null): Observable<IUser | undefined> {
+    if (!email) {
+      return of(undefined); // Si el correo electrónico es nulo, devuelve un Observable de usuario indefinido
+    }
+    return this.getUsers().pipe(
+      map(users => users.find(user => user.email === email))
+    );
+  }
 
   createUser(payload: CreateUserPayload): Observable<IUser> {
     return this.httpClient.post<IUser>(`${environment.baseAPIURL}/users`, payload)

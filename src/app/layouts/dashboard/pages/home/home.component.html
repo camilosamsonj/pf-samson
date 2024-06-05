@@ -1,1 +1,46 @@
-<p>home works!</p>
+    <mat-grid-list class="d-flex justify-content-center  col-6" cols="1" rowHeight="8:2">
+        <mat-grid-tile>
+            <mat-card class="w-100 p-50 align-items-center justify-content-center">
+                <mat-card-header>
+                    <mat-icon mat-card-avatar> verified_user </mat-icon>
+                    <mat-card-title><b>Usuarios</b></mat-card-title>
+                </mat-card-header>
+                
+                <mat-divider></mat-divider>
+                <mat-card-content>
+                    <div >
+                        <p>{{usersLength$ | async }} usuario(s) registrado(s)</p>
+                    </div>
+                    
+
+                </mat-card-content>
+            </mat-card>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <mat-card class="w-100 align-items-center justify-content-center">
+                <mat-card-header>
+                    <mat-icon mat-card-avatar>people</mat-icon>
+                    <mat-card-title><b>Alumnos</b></mat-card-title>
+                </mat-card-header>
+               
+                <mat-divider></mat-divider>
+                <mat-card-content>
+                    <p>{{studentsLength$ | async }} alumno(s) registrado(s)</p>
+                </mat-card-content>
+            </mat-card>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <mat-card class="w-100 align-items-center justify-content-center">
+                <mat-card-header>
+                    <mat-icon mat-card-avatar>class</mat-icon>
+                    <mat-card-title><b>Cursos</b></mat-card-title>
+                </mat-card-header>
+                <mat-divider></mat-divider>
+                <mat-card-content>
+                    <p>{{coursesLength$ | async }} curso(s) abierto(s)</p>
+
+                </mat-card-content>
+            </mat-card>
+        </mat-grid-tile>
+
+      </mat-grid-list>

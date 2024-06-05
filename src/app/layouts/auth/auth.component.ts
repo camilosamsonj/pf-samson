@@ -1,13 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { AuthService  } from './../../core/services/auth.service';
-import swal from 'sweetalert2'
+import { Subscription, concatMap, map, tap } from 'rxjs';
+import { AuthService } from './../../core/services/auth.service';
 import { ILoginData } from './models';
 import { Store } from '@ngrx/store';
-import { authActions } from '../../store/auth/auth.actions';
-import { authUser } from '../../store/auth/auth.selectors';
+import * as actions from '../../store/auth/auth.actions';
+import { selectAuthUser } from '../../store/auth/auth.selectors';
+import { MatDialog } from '@angular/material/dialog';
+import { RegisterComponent } from './register/register.component';
+import { UsersService } from '../dashboard/pages/users/users.service';
+import { SweetAlertService } from '../../core/services/sweet-alert.service';
 
 @Component({
   selector: 'app-auth',
@@ -15,10 +18,9 @@ import { authUser } from '../../store/auth/auth.selectors';
   styleUrls: ['./auth.component.scss'],
 })
 export class AuthComponent implements OnInit, OnDestroy {
-
   loginData: ILoginData = {
     email: '',
-    password: ''
+    password: '',
   };
 
   authUserChangeSubscription?: Subscription;
@@ -28,7 +30,10 @@ export class AuthComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private fb: FormBuilder,
-    private store: Store
+    private store: Store,
+    private matDialog: MatDialog,
+    private usersService: UsersService,
+    private sweetAlertService: SweetAlertService
   ) {
     this.authUserForm = this.fb.group({
       email: [
@@ -46,11 +51,11 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.store.select(authUser).subscribe({
+    this.store.select(selectAuthUser).subscribe({
       next: (user) => {
-        if(user)  this.router.navigate(['dashboard', 'home']);
-      }
-    })
+        if (user) this.router.navigate(['dashboard', 'home']);
+      },
+    });
   }
   ngOnDestroy(): void {
     this.authUserChangeSubscription?.unsubscribe();
@@ -61,65 +66,74 @@ export class AuthComponent implements OnInit, OnDestroy {
   get passwordControl() {
     return this.authUserForm.get('password');
   }
-  
 
   login(): void {
-    if(this.authUserForm.invalid){
-      swal.fire({
-        title: 'Formulario Invalido',
-        icon: 'warning',
-        text: 'Por favor complete los campos requeridos'
-      });
+    if (this.authUserForm.invalid) {
+      this.authUserForm.markAllAsTouched();
+      this.sweetAlertService.showCustomAlert('Formulario Inválido', 'Por favor complete los campos requeridos', 'warning');
     } else {
-      this.store.dispatch(authActions.login({payload: this.authUserForm.getRawValue()}));
-      const Toast = swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = swal.stopTimer;
-          toast.onmouseleave = swal.resumeTimer;
+      const userEmail = this.authUserForm.get('email')?.value;
+      this.usersService.getUserByEmail(userEmail).subscribe({
+        next: (payload) => {
+          payload;
+          this.store.dispatch(
+            actions.login({payload: this.authUserForm.getRawValue()})
+          )
+        },
+        error: (error) => {
+          console.error('Error al iniciar sesión', error);
+        },
+        complete: () => {
+          this.store.select(selectAuthUser).subscribe((user) => {
+            const firstName = user?.firstName;
+            const lastName = user?.lastName;
+            this.sweetAlertService.showCustomToast(`Bienvenido ${firstName} ${lastName} `, 'success');
+          }); 
+          
+        } 
+      });
+    }
+  }
+
+  openDialog(): void {
+    this.matDialog
+      .open(RegisterComponent)
+      .afterClosed()
+      .subscribe({
+        next: (result) => {
+          if(result) {
+            this.usersService.createUser(result).subscribe({
+              next: (userToCreate) => {
+                const currentDate = new Date();
+                userToCreate = {
+                  ...userToCreate,
+                  createdAt: currentDate,
+                }
+              },
+              error: (error) => {
+                this.sweetAlertService.showCustomAlert(
+                  'Error',
+                  `Error: ${error} al registrar el usuario`,
+                  'error'
+                );
+              },
+              complete: () => {
+                this.sweetAlertService.showCustomAlert(
+                  'Usuario creado',
+                  'El usuario se ha registrado correctamente',
+                  'success'
+                );
+              }
+            })
+          }
         }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: 'Inicio de sesión exitoso'
-      });
-    }
-  } 
-
-
-
-  logout(): void {
-    this.store.dispatch(authActions.logout());
-    const Toast = swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-      didOpen: (toast: any) => {
-        toast.onmouseenter = swal.stopTimer;
-        toast.onmouseleave = swal.resumeTimer;
       }
-    });
-    Toast.fire({
-      icon: 'info',
-      title: '¡Hasta pronto!'
-    });
-    this.router.navigate(['auth']);
-    
-  }
-
-  
-    onKeyDown(event: KeyboardEvent){
-      if (event.key === 'Enter') {
-        this.login();
         
-      }
+  )}
+
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      this.login();
     }
-
   }
-
+}

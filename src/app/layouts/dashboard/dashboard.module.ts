@@ -24,6 +24,7 @@ import { CommonModule } from "@angular/common";
         StudentsModule,
         
     ],
+
     exports: [DashboardComponent],
 })
 export class DashboardModule {}

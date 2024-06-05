@@ -1,0 +1,110 @@
+
+
+    <mat-card class="d-flex justify-content-center align-items-center">
+      <br>
+    <mat-card-title> Formulario de Registro </mat-card-title>
+    <br>
+    <mat-card-content>
+
+        <form [formGroup]="registerUserForm" (keydown)="onKeyDown($event)">
+            <div class="row">
+              <div [ngClass]="{'col-6': !isMobile(), 'col-12': isMobile() }">
+                <mat-form-field 
+                  class="w-100 p-2" 
+                  appearance="outline">
+                  <mat-label>Nombre</mat-label>
+                  <input matInput formControlName="firstName" />
+                  <mat-error *ngIf="firstNameControl?.invalid && firstNameControl?.touched">
+                    <span *ngIf="firstNameControl?.errors?.['required']">Este es un campo obligatorio</span>
+                    <span *ngIf="firstNameControl?.errors?.['pattern']">El nombre debe contener solo letras</span>
+                    <span *ngIf="firstNameControl?.errors?.['minlength']">Debe contener al menos 2 caracteres</span>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div [ngClass]="{'col-6': !isMobile(), 'col-12': isMobile() }">
+                <mat-form-field 
+                  class="w-100 p-2" 
+                  appearance="outline">
+                  <mat-label>Apellido</mat-label>
+                  <input formControlName="lastName" matInput />
+                  <mat-error *ngIf="lastNameControl?.invalid && lastNameControl?.touched">
+                    <span *ngIf="lastNameControl?.errors?.['required']">Este es un campo obligatorio</span>
+                    <span *ngIf="lastNameControl?.errors?.['pattern']">El apellido debe contener solo letras</span>
+                    <span *ngIf="lastNameControl?.errors?.['minlength']">Debe contener al menos 2 caracteres</span>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div [ngClass]="{'col-6': !isMobile(), 'col-12': isMobile() }">
+                <mat-form-field 
+                  class="w-100 p-2" 
+                  appearance="outline">
+                  <mat-label>Email</mat-label>
+                  <input formControlName="email" matInput placeholder="ejemplo@email.com" />
+                  <mat-error *ngIf="emailControl?.invalid && emailControl?.touched">
+                    <span *ngIf="emailControl?.errors?.['required']">Este es un campo obligatorio</span>
+                    <span *ngIf="emailControl?.errors?.['email']">Ingrese un email válido</span>
+                    <span *ngIf="emailControl?.errors?.['pattern']">La dirección de correo no es válida</span>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div [ngClass]="{'col-6': !isMobile(), 'col-12': isMobile() }">
+              <mat-form-field 
+              class="w-100 p-2" 
+              appearance="outline">
+              <mat-label>Role</mat-label>
+              <mat-select formControlName="role">
+        
+                        <mat-option value="ADMIN">ADMIN</mat-option>
+                        <mat-option value="USER">USER</mat-option>
+            
+              </mat-select> 
+              <mat-error *ngIf="roleControl?.invalid && roleControl?.touched">
+                <span *ngIf="roleControl?.errors?.['required']">Escoja un rol para el usuario </span>            
+              </mat-error>
+            </mat-form-field>
+            </div>
+
+              <div [ngClass]="{'col-6': !isMobile(), 'col-12': isMobile() }">
+                <mat-form-field 
+                  class="w-100 p-2" 
+                  appearance="outline">
+                  <mat-label>Crear Contraseña</mat-label>
+                  <input formControlName="password" matInput type="password"/>
+                  <mat-error
+                      *ngIf="passwordControl?.invalid && passwordControl?.touched"
+                    >
+                      <ng-container *ngIf="passwordControl?.errors?.['required']"
+                        >Este campo es obligatorio <br></ng-container
+                      >
+                      <ng-container *ngIf="passwordControl?.errors?.['minlength']"
+                        >La contraseña debe tener al menos 6
+                        caracteres</ng-container
+                      >
+                    </mat-error>
+                </mat-form-field>
+              </div>
+              <div [ngClass]="{'col-6': !isMobile(), 'col-12': isMobile() }">
+                <mat-form-field class="w-100 p-2" appearance="outline">
+                  <mat-label>Confirmar Contraseña</mat-label>
+                  <input formControlName="confirmPassword" matInput type="password" />
+                  <mat-error *ngIf="confirmPasswordControl?.invalid && confirmPasswordControl?.touched">
+                    <ng-container *ngIf="confirmPasswordControl?.errors?.['required']">
+                      Este campo es obligatorio
+                    </ng-container>
+                    <ng-container *ngIf="confirmPasswordControl?.errors?.['notEquals']">
+                      Las contraseñas deben ser iguales
+                    </ng-container>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+             
+            </div>
+          </form>
+    </mat-card-content>
+      
+  
+  <mat-card-actions class="d-flex justify-content-end" >
+      <button mat-raised-button mat-dialog-close color="warn">Cancelar</button>
+      <button (click)="onSave()" mat-raised-button color="primary">Guardar</button>
+  </mat-card-actions>
+</mat-card>

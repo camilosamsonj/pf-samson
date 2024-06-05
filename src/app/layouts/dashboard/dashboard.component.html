@@ -12,9 +12,24 @@
         <mat-icon class="menu-button-icon">menu</mat-icon>
       </button>
     </div>
-    <span style="color: white">Panel de Administración</span>
-    <div *ngIf="authUser$ | async; let user" class="row d-flex justify-content-end w-100">
-      <span class="col-3" style="color:white"> <pre> Hola: {{user.firstName}}</pre></span>
+    <span style="color: white">Panel de Administración    -    <b>{{(routeData$ | async)?.["title"]}}</b></span>
+    <div *ngIf="authUser$ | async; let user;" class="row d-flex justify-content-end w-100 p-30">
+      <div class="row align-items-center justify-content-end">
+        <div class="col-3 align-items-end justify-content-end">
+          <span class="row" style="color:white"> <h5> Usuario: <b>{{user.firstName}} {{user.lastName}}</b></h5></span>
+          <span class="row" style="color: grey"><h5><b>{{user.role}}</b></h5></span>
+        </div>
+        <div class="col-1">
+          <span class="row" style="color:white">
+            {{ currentDate| async | date: 'dd/MM/yyyy'}} 
+          </span>
+          <span class="row" style="color:white">
+            {{ currentTime | async | date: 'mediumTime'}} 
+         </span>
+         
+
+        </div>
+      </div>
       
     </div>
   </mat-toolbar>
@@ -44,12 +59,14 @@
       </a>
            <!-- Ruta Alumnos -->
 
-      <a routerLink="users"
+      <a
+        *ngIf="(authUser$ | async)?.role === 'ADMIN'" 
+        routerLink="users"
         (click)="drawer.mode === 'over' && drawer.toggle()"
         class="custom-matlist-item-hover"
         mat-list-item
       >
-        <mat-icon matListItemIcon>people</mat-icon> Usuarios
+        <mat-icon matListItemIcon>people_outline</mat-icon> Usuarios
       </a>
 
      <!-- Ruta cursos -->

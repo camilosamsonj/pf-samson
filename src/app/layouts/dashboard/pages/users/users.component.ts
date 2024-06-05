@@ -4,7 +4,6 @@ import { Observable, map, take, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { UsersService } from './users.service';
 import { UsersDialogComponent } from './components/users-dialog/users-dialog.component';
-import swal from 'sweetalert2';
 import { Store } from '@ngrx/store';
 import {
   selectLoadingUsers,
@@ -13,6 +12,7 @@ import {
 } from './store/users.selectors';
 import { UsersActions } from './store/users.actions';
 import { SweetAlertService } from '../../../../core/services/sweet-alert.service';
+import { selectAuthUser } from '../../../../store/auth/auth.selectors';
 
 @Component({
   selector: 'app-users',
@@ -32,6 +32,7 @@ export class UsersComponent implements OnInit {
   loadingUsers$: Observable<boolean>;
   users$: Observable<IUser[]>;
   error$: Observable<unknown>;
+
 
   constructor(
     private matDialog: MatDialog,
