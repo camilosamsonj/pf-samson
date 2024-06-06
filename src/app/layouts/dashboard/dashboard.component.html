@@ -1,5 +1,5 @@
 <!-- TOOLBAR  -->
-<div class="toolbar-container">
+<div class="toolbar-container d-flex">
   <mat-toolbar class="custom-toolbar">
     
     <div class="example-button-container">
@@ -13,7 +13,7 @@
       </button>
     </div>
     <span style="color: white">Panel de Administración    -    <b>{{(routeData$ | async)?.["title"]}}</b></span>
-    <div *ngIf="authUser$ | async; let user;" class="row d-flex justify-content-end w-100 p-30">
+    <div *ngIf="authUser$ | async; let user;" class="row d-flex justify-content-end w-100 p-30 m-30">
       <div class="row align-items-center justify-content-end">
         <div class="col-3 align-items-end justify-content-end">
           <span class="row" style="color:white"> <h5> Usuario: <b>{{user.firstName}} {{user.lastName}}</b></h5></span>
