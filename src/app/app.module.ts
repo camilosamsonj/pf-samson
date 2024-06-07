@@ -15,7 +15,6 @@ import { EffectsModule } from '@ngrx/effects';
 import { AuthEffects } from './store/auth/auth.effects';
 
 
-
 @NgModule({
   declarations: [
     AppComponent,

@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { IStudent} from '../../models';
-import swal from 'sweetalert2';
+import {SweetAlertService} from '../../../../../../core/services/sweet-alert.service';
 
 @Component({
   selector: 'app-student-dialog',
@@ -34,6 +34,7 @@ export class StudentDialogComponent {
   ];
 
   constructor (
+    private sweetAlertService: SweetAlertService,
     private fb: FormBuilder,
     private matDialogRef: MatDialogRef<StudentDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public editingStudent?: IStudent
@@ -92,14 +93,7 @@ export class StudentDialogComponent {
   onSave(): void {
     if(this.studentForm.invalid){
       this.studentForm.markAllAsTouched();
-      swal.fire({
-        title: 'Formulario Inválido',
-        text: 'Debe completar el formulario, o ingresar datos válidos',
-        icon: 'warning',
-        timer: 1500, 
-        timerProgressBar: true, 
-        showConfirmButton: false 
-      });
+      this.sweetAlertService.showCustomAlert('Formulario Invalido', 'Debe completar el formulario o ingresar datos válidos', 'warning');
     } else {
       const updatedStudent: IStudent = this.studentForm.value;
 
